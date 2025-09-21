@@ -1,141 +1,55 @@
-/* Discord OAuth2 — عرض السيرفرات التي ينتمي لها المستخدم (بدون إدخال توكن يدوي) ملف واحد: index.js شرح سريع في الأسفل عن كيفية التشغيل
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Private</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000; /* خلفية سوداء */
+      font-family: Arial, sans-serif;
+    }
 
-ملاحظة مهمة:
+    h1 {
+      color: #fff; /* النص أبيض */
+      font-size: 15vw; /* يتناسب مع عرض الشاشة */
+      font-weight: bold;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.8);
+      animation: fadeZoom 2s ease forwards, glow 2s infinite 2s;
+    }
 
-لا أقدّم أدوات تطلب "توكن حساب المستخدم" مباشرة (self-bot) لأن هذا يخالف سياسة Discord (ويمكن أن يؤدي لحظر الحساب).
+    /* حركة دخول تدريجية */
+    @keyframes fadeZoom {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
 
-الحل الآمن والمسموح: استخدام OAuth2 — المستخدم يسجّل دخول عبر صفحة Discord ويمنح التطبيق صلاحية قراءة القوائم (scope: guilds). التطبيق لا يرى كلمة السر ولا يطلب توكن خام.
-
-
-ما يفعله هذا السكربت:
-
-يفتح صفحة تسجيل دخول Discord OAuth2
-
-يستقبل الكود من Discord عند نجاح المصادقة
-
-يستبدل الكود بتوكن وصول (access token)
-
-يطلب قائمة السيرفرات من endpoint: /users/@me/guilds
-
-يعرض النتائج في صفحة HTML مرتبة ومعلومات (اسم السيرفر، الايدي، أيقونة إذا كانت متوفرة)
-
-
-تثبيت متطلبات (في نفس المجلد): package.json (تحتاجها): { "name": "discord-guilds-oauth", "version": "1.0.0", "main": "index.js", "scripts": { "start": "node index.js" }, "dependencies": { "express": "^4.18.2", "node-fetch": "^2.6.7", "cookie-session": "^2.0.0" } }
-
-ثم: npm install
-
-تكوين تطبيق Discord (Developer Portal):
-
-1. اذهب إلى https://discord.com/developers/applications
-
-
-2. أنشئ تطبيق جديد، ثم "OAuth2" -> "OAuth2 URL Generator"
-
-ضع scopes: identify و guilds
-
-ضع redirect URI: http://localhost:3000/callback
-
-
-
-3. انسخ CLIENT_ID و CLIENT_SECRET
-
-
-
-تشغيل السكربت:
-
-1. أنشئ ملف .env أو صدّر المتغيرات بهذه الطريقة قبل التشغيل: export CLIENT_ID=... export CLIENT_SECRET=... export SESSION_SECRET=some_long_secret
-
-
-2. node index.js
-
-
-3. افتح: http://localhost:3000
-
-
-
-الكود (index.js): */
-
-const express = require('express'); const fetch = require('node-fetch'); const session = require('cookie-session');
-
-const app = express(); const PORT = process.env.PORT || 3000;
-
-const CLIENT_ID = process.env.CLIENT_ID || ''; // ضع هنا CLIENT_ID أو عبر env const CLIENT_SECRET = process.env.CLIENT_SECRET || ''; // ضع هنا CLIENT_SECRET const REDIRECT_URI = process.env.REDIRECT_URI || http://localhost:${PORT}/callback; const SESSION_SECRET = process.env.SESSION_SECRET || 'change_this_session_secret';
-
-if (!CLIENT_ID || !CLIENT_SECRET) { console.warn('Warning: CLIENT_ID or CLIENT_SECRET not set. Set environment variables CLIENT_ID and CLIENT_SECRET.'); }
-
-app.use(express.urlencoded({ extended: true })); app.use(express.json()); app.use( session({ name: 'discord.oauth.session', keys: [SESSION_SECRET], maxAge: 24 * 60 * 60 * 1000, }) );
-
-function discordOauthUrl() { const params = new URLSearchParams({ client_id: CLIENT_ID, redirect_uri: REDIRECT_URI, response_type: 'code', scope: 'identify guilds' }); return https://discord.com/api/oauth2/authorize?${params.toString()}; }
-
-app.get('/', (req, res) => { res.send(<html> <head> <meta charset="utf-8" /> <title>تسجيل دخول Discord - عرض السيرفرات</title> <meta name="viewport" content="width=device-width,initial-scale=1"> <style>body{font-family:Arial,helvetica,sans-serif;padding:20px;background:#0f172a;color:#e6eef8}a.btn{display:inline-block;padding:12px 18px;background:#5865f2;color:white;text-decoration:none;border-radius:8px} .card{background:rgba(255,255,255,0.04);padding:12px;border-radius:10px;margin:10px 0}</style> </head> <body> <h1>عرض السيرفرات (باستخدام OAuth2)</h1> <p>اضغط لتسجيل الدخول عبر حساب Discord — التطبيق سيقرأ قائمة السيرفرات فقط.</p> <a class="btn" href="/login">تسجيل دخول عبر Discord</a> <hr/> <p>ملاحظات: لا تدخل توكن حسابك هنا مباشرة. استخدم طريقة OAuth2 الآمنة.</p> </body> </html>); });
-
-app.get('/login', (req, res) => { res.redirect(discordOauthUrl()); });
-
-app.get('/callback', async (req, res) => { const code = req.query.code; if (!code) return res.status(400).send('No code provided');
-
-try { const params = new URLSearchParams(); params.append('client_id', CLIENT_ID); params.append('client_secret', CLIENT_SECRET); params.append('grant_type', 'authorization_code'); params.append('code', code); params.append('redirect_uri', REDIRECT_URI);
-
-const tokenResp = await fetch('https://discord.com/api/oauth2/token', {
-  method: 'POST',
-  body: params,
-  headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-});
-
-const tokenData = await tokenResp.json();
-
-if (!tokenData.access_token) {
-  return res.status(500).send('Failed to get access token: ' + JSON.stringify(tokenData));
-}
-
-// خزّن التوكن في الجلسة مؤقتاً
-req.session.access_token = tokenData.access_token;
-
-// احصل على السيرفرات
-const guildsResp = await fetch('https://discord.com/api/users/@me/guilds', {
-  headers: { Authorization: `Bearer ${tokenData.access_token}` }
-});
-const guilds = await guildsResp.json();
-
-// رتب حسب الاسم
-if (Array.isArray(guilds)) guilds.sort((a, b) => a.name.localeCompare(b.name));
-
-// عرض HTML منسق
-let html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>قائمة السيرفرات</title>
-  <style>body{font-family:Arial,helvetica,sans-serif;padding:18px;background:#071029;color:#eaf0ff} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px} .card{background:rgba(255,255,255,0.04);padding:12px;border-radius:10px} img.icon{width:48px;height:48px;border-radius:8px;vertical-align:middle;margin-right:8px}</style></head><body>
-  <h1>السيرفرات التي ينتمي لها الحساب</h1>
-  <p>العدد: ${Array.isArray(guilds) ? guilds.length : 0}</p>
-  <div class="grid">
-`;
-
-if (Array.isArray(guilds)) {
-  for (const g of guilds) {
-    const iconUrl = g.icon ? `https://cdn.discordapp.com/icons/${g.id}/${g.icon}.png` : null;
-    html += `<div class="card">`;
-    if (iconUrl) html += `<img class="icon" src="${iconUrl}" alt="icon">`;
-    html += `<strong>${escapeHtml(g.name)}</strong><br>`;
-    html += `<small>ID: ${g.id}</small><br>`;
-    html += `<small>Owner: ${g.owner ? 'Yes' : 'No'}</small>`;
-    html += `</div>`;
-  }
-} else {
-  html += `<div class="card">تعذر جلب السيرفرات: ${escapeHtml(JSON.stringify(guilds))}</div>`;
-}
-
-html += `</div><hr><a href="/">العودة</a></body></html>`;
-
-res.send(html);
-
-} catch (err) { console.error(err); res.status(500).send('حدث خطأ: ' + escapeHtml(err.message || String(err))); } });
-
-function escapeHtml(s) { if (!s) return ''; return String(s) .replace(/&/g, '&') .replace(/</g, '<') .replace(/>/g, '>') .replace(/"/g, '"') .replace(/'/g, '''); }
-
-app.listen(PORT, () => { console.log(Server running on http://localhost:${PORT} — redirect URI should match ${REDIRECT_URI}); });
-
-/* خلاصة:
-
-هذا الحل يستخدم OAuth2 الرسمي من Discord (آمن ومرخص بواسطة Discord OAuth).
-
-لا تدخل توكن الحساب يدوياً — هذا قد يؤدي لحظر الحساب ويخالف القوانين/سياسات.
-
-
-إذا تريد، أقدر أعدّل السكربت ليحفظ نتائج السيرفرات في ملف JSON، أو يضيف زر لنسخ الايدي، أو يعرض أيقونات أكبر، أو يصدر CSV. اخبرني أي إضافة تريد وسأعدلها مباشرة. */
+    /* وميض مستمر */
+    @keyframes glow {
+      0%, 100% {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff;
+        opacity: 1;
+      }
+      50% {
+        text-shadow: 0 0 20px #888, 0 0 40px #ccc;
+        opacity: 0.7;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Private</h1>
+</body>
+</html>
