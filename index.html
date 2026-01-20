@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Axo | Mastering The Code</title>
+    <!-- استدعاء خطوط Google -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- استدعاء أيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* --- إعدادات الألوان والتوهج --- */
+        :root {
+            --primary: #7c3aed; 
+            --primary-glow: rgba(124, 58, 237, 0.6);
+            --text-white: #ffffff;
+            --text-gray: #a1a1aa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+            max-width: 100vw; 
+            /* منع تحديد أي عنصر */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* قياسي */
+            background-color: #000000;
+            color: var(--text-white);
+            font-family: 'Manrope', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+        }
+
+        /* --- تكنيك اللمعة الخلفية (The Shine) --- */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            left: -10%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 10s infinite alternate;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #4c1d95 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 12s infinite alternate-reverse;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        /* --- Navbar --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-sizing: border-box;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(to right, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            z-index: 1002;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-white);
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        .btn-nav {
+            background-color: var(--primary);
+            color: white !important;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn-nav:hover {
+            box-shadow: 0 0 25px rgba(124, 58, 237, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            z-index: 1002;
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 20px;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .hero-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 300px;
+            background: radial-gradient(ellipse, rgba(124, 58, 237, 0.2) 0%, transparent 70%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 25px;
+            background: linear-gradient(180deg, #ffffff 0%, #c4b5fd 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(124, 58, 237, 0.3));
+            word-wrap: break-word;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-gray);
+            max-width: 700px;
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+
+        /* --- Section Styling --- */
+        .section-padding {
+            padding: 80px 5%;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .grid-3, .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            width: 100%;
+        }
+
+        /* --- Cards --- */
+        .glass-card, .project-card, .member-card {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: 0.3s;
+            box-sizing: border-box;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 30px;
+        }
+        
+        .glass-card:hover, .member-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(139, 92, 246, 0.4);
+            box-shadow: 0 0 40px rgba(139, 92, 246, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .project-card {
+            background: #050505;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 50px -10px rgba(124, 58, 237, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), transparent);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+        }
+
+        .project-img {
+            height: 200px;
+            width: 100%;
+            background: linear-gradient(135deg, #1a1033, #000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255,255,255,0.05);
+            font-size: 3rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-img::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+            transform: skewX(-25deg);
+            transition: 0.5s;
+        }
+
+        .project-card:hover .project-img::after {
+            left: 150%;
+        }
+
+        .project-body {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .tag {
+            background: rgba(124, 58, 237, 0.2);
+            color: #d8b4fe;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: inline-block;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+        }
+
+        /* --- Team --- */
+        .member-card {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2e1065, #000);
+            margin: 0 auto 20px;
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+
+        /* --- FAQ --- */
+        .faq-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px 0;
+            cursor: pointer;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .faq-answer {
+            margin-top: 15px;
+            color: var(--text-gray);
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        /* --- Footer --- */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 60px 5% 20px;
+            background: #000;
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+            width: 100%;
+        }
+
+        .footer-col h5 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-col ul li a {
+            color: var(--text-gray);
+            text-decoration: none;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 8px rgba(124, 58, 237, 0.6);
+        }
+
+        .copyright {
+            text-align: center;
+            color: #555;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.8rem;
+        }
+
+        /* --- استعلامات الوسائط للجوال (Media Queries) --- */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 70%;
+                background: #000;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                transition: 0.4s ease;
+                border-left:1px solid rgba(255, 255, 255, 0.1);
+                overflow-y: auto;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero p {
+                font-size: 1rem;
+                padding: 0 10px;
+            }
+
+            .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <a href="#" class="logo">
+            <i class="fa-solid fa-layer-group"></i> Axo
+        </a>
+        <div class="menu-toggle" id="mobile-menu">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="nav-links" id="nav-links">
+            <a href="#about" onclick="closeMenu()">About</a>
+            <a href="#projects" onclick="closeMenu()">Projects</a>
+            <a href="#team" onclick="closeMenu()">Team</a>
+            <a href="#faq" onclick="closeMenu()">FAQ</a>
+            <a href="#contact" class="btn-nav" onclick="closeMenu()">Contact Axo</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-glow"></div>
+        <h1>Axo: Mastering The Code,<br>Engineering The Future</h1>
+        <p>Axo is led by elite developers. We build powerful, high-performance digital solutions that push boundaries.</p>
+    </section>
+
+    <!-- About/Features Section -->
+    <section id="about" class="section-padding">
+        <div class="grid-3">
+            <div class="glass-card">
+                <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+                <h3>High Performance</h3>
+                <p>Axo's code is optimized for speed and efficiency, ensuring your applications run flawlessly under any load.</p>
+            </div>
+            <div class="glass-card">
+                <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3>Secure Solutions</h3>
+                <p>We prioritize security in every line of code, delivering robust systems that protect your data and users.</p>
+            </div>
+            <div class="glass-card">
+                <div class="feature-icon"><i class="fa-solid fa-code-branch"></i></div>
+                <h3>Innovative Tech</h3>
+                <p>Using the latest technologies and frameworks to build modern, scalable, and future-proof software.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section-padding">
+        <div class="projects-header" style="text-align: center; margin-bottom: 60px;">
+            <h2 style="font-size: 2.5rem; margin-bottom: 10px;">Axo's Projects</h2>
+            <p style="color: var(--text-gray);">Cutting-edge tools built for the community.</p>
+        </div>
+        <div class="grid-4">
+            <!-- Project 1 -->
+            <div class="project-card">
+                <div class="project-img"><i class="fa-brands fa-discord"></i></div>
+                <div class="project-body">
+                    <span class="tag">Live</span>
+                    <h3 style="margin-bottom: 10px;">Discord Username Generator</h3>
+                    <p style="color: var(--text-gray); font-size: 0.9rem;">An advanced tool developed by Axo to generate unique and aesthetic Discord usernames instantly.</p>
+                </div>
+            </div>
+            <!-- Project 2 (CoreBot) -->
+            <div class="project-card">
+                <div class="project-img"><i class="fa-solid fa-robot"></i></div>
+                <div class="project-body">
+                    <span class="tag" style="background: rgba(255, 255, 255, 0.1); color: #fff;">Latest</span>
+                    <h3 style="margin-bottom: 10px;">CoreBot</h3>
+                    <p style="color: var(--text-gray); font-size: 0.9rem;">An all-in-one Discord solution designed for seamless community management. Experience advanced moderation, custom economy, and premium utilities.</p>
+                </div>
+            </div>
+            <!-- Project 3 -->
+            <div class="project-card">
+                <div class="project-img"><i class="fa-solid fa-user-shield"></i></div>
+                <div class="project-body">
+                    <span class="tag">Live</span>
+                    <h3 style="margin-bottom: 10px;">Discord Account Generator</h3>
+                    <p style="color: var(--text-gray); font-size: 0.9rem;">Secure account creation integrated with temporary number API. Fast, reliable, and designed by Axo.</p>
+                </div>
+            </div>
+            <!-- Project 4 -->
+            <div class="project-card">
+                <div class="project-img"><i class="fa-solid fa-server"></i></div>
+                <div class="project-body">
+                    <span class="tag">Latest</span>
+                    <h3 style="margin-bottom: 10px;">Axion Host</h3>
+                    <p style="color: var(--text-gray); font-size: 0.9rem;">Premium hosting services providing high-speed servers and 99.9% uptime. Axo ensures quality.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="section-padding">
+        <div class="projects-header" style="text-align: center; margin-bottom: 60px;">
+            <h2 style="font-size: 2.5rem;">Meet The Team</h2>
+            <p style="color: var(--text-gray);">The masterminds behind Axo.</p>
+        </div>
+        <div class="grid-3" style="display: flex; justify-content: center; gap: 30px; flex-wrap: wrap;">
+            <div class="member-card" style="flex: 1; min-width: 280px;">
+                <div class="member-avatar"><i class="fa-solid fa-code"></i></div>
+                <h3>Z3em</h3>
+                <div style="color: var(--primary); font-size: 0.85rem; margin-bottom: 15px; font-weight: 600;">Full-Stack Developer</div>
+                <div style="display: flex; justify-content: center; gap: 15px; color: var(--text-gray);">
+                    <i class="fa-brands fa-github"></i>
+                    <i class="fa-brands fa-discord"></i>
+                </div>
+            </div>
+            <div class="member-card" style="flex: 1; min-width: 280px;">
+                <div class="member-avatar"><i class="fa-solid fa-laptop-code"></i></div>
+                <h3>Mxnou</h3>
+                <div style="color: var(--primary); font-size: 0.85rem; margin-bottom: 15px; font-weight: 600;">Full-Stack Developer</div>
+                <div style="display: flex; justify-content: center; gap: 15px; color: var(--text-gray);">
+                    <i class="fa-brands fa-github"></i>
+                    <i class="fa-brands fa-discord"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section id="faq" class="section-padding">
+        <div class="projects-header" style="text-align: center; margin-bottom: 60px;">
+            <h2 style="font-size: 2.5rem;">FAQ About Axo</h2>
+        </div>
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div class="faq-item">
+                <div class="faq-question">Who is Axo? <i class="fa-solid fa-plus"></i></div>
+                <div class="faq-answer">Axo is a premier development team founded by elite developers, specializing in automation, tools, and hosting.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">What is CoreBot? <i class="fa-solid fa-plus"></i></div>
+                <div class="faq-answer">CoreBot is an advanced Discord bot developed by Axo, offering all-in-one features like moderation, economy, and seamless utility integration.</div>
+            </div>
+            <div class="faq-item">
+                <div class="faq-question">How can I contact Axo? <i class="fa-solid fa-plus"></i></div>
+                <div class="faq-answer">You can reach Axo directly at axo.teamm@gmail.com for any inquiries or support requests.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <div class="logo" style="margin-bottom: 15px;">Axo</div>
+                <p style="color: var(--text-gray); font-size: 0.9rem;">The official portfolio of Axo. Mastering code, engineering the future with elite solutions.</p>
+            </div>
+            <div class="footer-col">
+                <h5>Projects</h5>
+                <ul>
+                    <li><a href="#">Username Generator</a></li>
+                    <li><a href="#">CoreBot</a></li>
+                    <li><a href="#">Account Generator</a></li>
+                    <li><a href="#">Axion Host</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Services</h5>
+                <ul>
+                    <li><a href="#">Development</a></li>
+                    <li><a href="#">Hosting</a></li>
+                    <li><a href="#">Consulting</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h5>Contact Axo</h5>
+                <p style="color: var(--text-gray); font-size: 0.9rem;">axo.teamm@gmail.com</p>
+                <div style="margin-top: 10px; display: flex; gap: 15px;">
+                    <a href="#" style="color: var(--text-gray);"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" style="color: var(--text-gray);"><i class="fa-brands fa-discord"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="copyright">
+            &copy; 2026 Axo. All Rights Reserved.
+        </div>
+    </footer>
+
+    <script>
+        // --- كود الحماية من النسخ وسرقة الفرونت اند ---
+        
+        // 1. كود إظهار الرسالة في الـ Console
+        console.log(
+            "%c تبي تشوف الفرونت اند هاا؟ كلزق يس ",
+            "background: #7c3aed; color: #fff; font-size: 20px; padding: 10px; border-radius: 5px; font-weight: bold; text-shadow: 1px 1px 0 #000;"
+        );
+
+        // 2. منع الزر الأيمن (Right Click)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 3. منع اختصارات النسخ وأدوات المطورين
+        document.addEventListener('keydown', function(e) {
+            // منع F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+            // منع Ctrl + Shift + I (Inspect)
+            if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                e.preventDefault();
+                return false;
+            }
+            // منع Ctrl + Shift + C (Inspect Element)
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                return false;
+            }
+            // منع Ctrl + U (View Source)
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+                return false;
+            }
+            // منع Ctrl + S (Save Page)
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                return false;
+            }
+            // منع Ctrl + C (Copy) - إختياري
+            if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                return false;
+            }
+            // منع Ctrl + P (Print)
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // --- منطق القائمة الجانبية للجوال ---
+        const menuToggle = document.getElementById('mobile-menu');
+        const navLinks = document.getElementById('nav-links');
+        const icon = menuToggle.querySelector('i');
+
+        // فتح وإغلاق القائمة
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            if(navLinks.classList.contains('active')){
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // دالة لإغلاق القائمة عند الضغط على رابط
+        function closeMenu() {
+            // التحقق من أننا في وضع الجوال
+            if (window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                icon.classList.remove('fa-xmark');
+                icon.classList.add('fa-bars');
+            }
+        }
+
+        // FAQ Logic
+        const faqs = document.querySelectorAll('.faq-item');
+        faqs.forEach(faq => {
+            faq.addEventListener('click', () => {
+                faqs.forEach(item => item.classList.remove('active'));
+                faq.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
